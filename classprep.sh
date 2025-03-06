@@ -114,8 +114,8 @@ install_modules() {
         # Debugging: show the module we're processing
         echo "Processing module: $module"
         
-        # Check if any versioned files exist for this module
-        versioned_files=$(ls "$MODULES_DIR/$module"-*.sh 2>/dev/null)
+        # Use find to search for versioned files instead of ls
+        versioned_files=$(find "$MODULES_DIR" -type f -name "$module-*.sh" 2>/dev/null)
 
         # Debugging: Show versioned files that were found
         echo "Found versioned files for $module: $versioned_files"
