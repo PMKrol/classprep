@@ -68,11 +68,18 @@ setup_environment() {
 fetch_modules() {
     echo "Fetching latest modules..."
     sudo mkdir -p "$MODULES_DIR"
-    if [[ ! -d "$MODULES_DIR/.git" ]]; then
-        sudo git clone "$GITHUB_REPO" "$MODULES_DIR"
-    else
-        sudo git -C "$MODULES_DIR" pull
+
+    TEMP_DIR=$(mktemp -d)
+    sudo git clone --depth=1 "$GITHUB_REPO" "$TEMP_DIR"
+
+    # Move only the contents of the 'modules' directory
+    if [[ -d "$TEMP_DIR/modules" ]]; then
+        sudo mv "$TEMP_DIR/modules/"* "$MODULES_DIR/"
     fi
+
+    # Cleanup temporary directory
+    sudo rm -rf "$TEMP_DIR"
+
     echo "Modules fetched successfully."
 }
 
