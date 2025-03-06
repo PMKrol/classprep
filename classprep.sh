@@ -97,28 +97,21 @@ install_modules() {
         exit 1
     fi
 
-    # Extract unique module names without version numbers
-    module_names=$(find "$MODULES_DIR" -type f -name "*.sh" | sed -E 's|.*/([^/]+)-[0-9]+\.[0-9]+\.[0-9]+\.sh$|\1|' | sort -u)
-
-    # Debugging: Show the modules found
-    echo "Module names extracted: $module_names"
+    # Extract unique module names, including those without versions
+    module_names=$(find "$MODULES_DIR" -type f -name "*.sh" | sed -E 's|.*/([^/]+)-[0-9]+\.[0-9]+\.sh$|\1|' | sed -E 's|.*/([^/]+)\.sh$|\1|' | sort -u)
 
     if [[ -z "$module_names" ]]; then
         echo "No modules found in $MODULES_DIR"
         exit 1
     fi
 
-    echo "Found the following modules: $module_names"
+    # Create directory for storing installed module versions
+    INSTALLED_MODULES_DIR="/etc/classprep/installed_modules"
+    sudo mkdir -p "$INSTALLED_MODULES_DIR"
 
     for module in $module_names; do
-        # Debugging: show the module we're processing
-        echo "Processing module: $module"
-        
-        # Use find to search for versioned files instead of ls
-        versioned_files=$(find "$MODULES_DIR" -type f -name "$module-*.sh" 2>/dev/null)
-
-        # Debugging: Show versioned files that were found
-        echo "Found versioned files for $module: $versioned_files"
+        # Find versioned files for this module
+        versioned_files=$(ls "$MODULES_DIR/$module"-*.sh 2>/dev/null)
 
         if [[ -z "$versioned_files" ]]; then
             echo "No versioned files found for module: $module"
@@ -128,13 +121,36 @@ install_modules() {
         # Find the latest version by sorting the versioned files
         latest_version=$(echo "$versioned_files" | sort -V | tail -n 1)
 
-        # Debugging: Show the latest version being installed
-        echo "Latest version for $module: $latest_version"
-
         if [[ -n "$latest_version" ]]; then
+            # Extract version (X.Y) from the filename
+            version=$(echo "$latest_version" | sed -E 's|.*/([^/]+)-([0-9]+\.[0-9]+)\.sh$|\2|')
+
+            # Check if the module has already been installed
+            installed_version_file="$INSTALLED_MODULES_DIR/$module"
+            if [[ -f "$installed_version_file" ]]; then
+                installed_version=$(cat "$installed_version_file")
+                
+                # Compare versions (X.Y)
+                if [[ "$installed_version" == "$version" ]]; then
+                    echo "Module $module is already up to date (version $version). Skipping installation."
+                    continue
+                elif [[ "$installed_version" < "$version" ]]; then
+                    echo "Module $module has an older version ($installed_version). Uninstalling old version and installing new one."
+                    
+                    # Uninstall the old version (run with uninstall argument)
+                    echo "Running uninstall for old version ($installed_version) of module: $module"
+                    sudo "$latest_version" uninstall
+                fi
+            fi
+
+            # Installing the new version (pass install argument)
             echo "Installing module: $latest_version"
             sudo chmod +x "$latest_version"
-            sudo "$latest_version"
+            sudo "$latest_version" install
+
+            # Save the installed version
+            echo "$version" | sudo tee "$INSTALLED_MODULES_DIR/$module" > /dev/null
+            echo "Installed version $version for module $module."
         else
             echo "No valid versions found for module: $module"
         fi
