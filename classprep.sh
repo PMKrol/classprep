@@ -100,6 +100,9 @@ install_modules() {
     # Extract unique module names without version numbers
     module_names=$(find "$MODULES_DIR" -type f -name "*.sh" | sed -E 's|.*/([^/]+)-[0-9]+\.[0-9]+\.[0-9]+\.sh$|\1|' | sort -u)
 
+    # Debugging: Show the modules found
+    echo "Module names extracted: $module_names"
+
     if [[ -z "$module_names" ]]; then
         echo "No modules found in $MODULES_DIR"
         exit 1
@@ -139,6 +142,7 @@ install_modules() {
 
     echo "All available modules installed."
 }
+
 
 # Main menu
 main_menu() {
