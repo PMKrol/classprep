@@ -196,5 +196,20 @@ main_menu() {
     esac
 }
 
-# Run menu
-main_menu
+# Check if the script is called with an argument
+if [[ -n "$1" ]]; then
+    # If argument is provided, directly call the corresponding function
+    case $1 in
+        1) update_system ;;
+        2) install_dependencies ;;
+        3) setup_environment ;;
+        4) fetch_modules ;;
+        5) install_modules ;;
+        6) update_system && install_dependencies && setup_environment && fetch_modules && install_modules ;;
+        7) exit 0 ;;
+        *) echo "Invalid argument! Please provide a valid option number." ;;
+    esac
+else
+    # If no argument is passed, show the menu
+    main_menu
+fi
