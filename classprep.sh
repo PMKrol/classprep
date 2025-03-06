@@ -105,11 +105,22 @@ install_modules() {
         exit 1
     fi
 
+    echo "Found the following modules: $module_names"
+
     for module in $module_names; do
-        # Find the latest version by looking for files matching the module name pattern
-        latest_version=$(ls "$MODULES_DIR/$module"-*.sh 2>/dev/null | sort -V | tail -n 1)
+        # Debugging: show the module we're processing
+        echo "Processing module: $module"
         
-        echo "module $module version: $latest_version"
+        # Check if any versioned files exist for this module
+        versioned_files=$(ls "$MODULES_DIR/$module"-*.sh 2>/dev/null)
+
+        if [[ -z "$versioned_files" ]]; then
+            echo "No versioned files found for module: $module"
+            continue
+        fi
+
+        # Find the latest version by sorting the versioned files
+        latest_version=$(echo "$versioned_files" | sort -V | tail -n 1)
 
         if [[ -n "$latest_version" ]]; then
             echo "Installing module: $latest_version"
@@ -122,6 +133,7 @@ install_modules() {
 
     echo "All available modules installed."
 }
+
 
 
 # Main menu
