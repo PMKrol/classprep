@@ -136,10 +136,19 @@ install_modules() {
                     continue
                 elif [[ "$installed_version" < "$version" ]]; then
                     echo "Module $module has an older version ($installed_version). Uninstalling old version and installing new one."
-                    
-                    # Uninstall the old version (run with uninstall argument)
-                    echo "Running uninstall for old version ($installed_version) of module: $module"
-                    sudo "$latest_version" uninstall
+
+                    # Identify the old version file
+                    old_version_file=$(echo "$versioned_files" | grep -E "([0-9]+\.[0-9]+)" | sort -V | head -n 1)
+
+                    if [[ -n "$old_version_file" ]]; then
+                        echo "Uninstalling old version ($installed_version) using $old_version_file"
+                        
+                        # Run uninstall for the old version using the identified file
+                        sudo chmod +x "$old_version_file"
+                        sudo "$old_version_file" uninstall
+                    else
+                        echo "No old version found to uninstall for module: $module"
+                    fi
                 fi
             fi
 
