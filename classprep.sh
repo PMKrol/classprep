@@ -108,6 +108,8 @@ install_modules() {
     for module in $module_names; do
         # Find the latest version by looking for files matching the module name pattern
         latest_version=$(ls "$MODULES_DIR/$module"-*.sh 2>/dev/null | sort -V | tail -n 1)
+        
+        echo "module $module version: $latest_version"
 
         if [[ -n "$latest_version" ]]; then
             echo "Installing module: $latest_version"
