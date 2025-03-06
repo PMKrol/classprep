@@ -25,7 +25,6 @@ setup_environment() {
 
     # Ensure the modules directory exists
     sudo mkdir -p "$MODULES_DIR" /opt/classprep
-    sudo chown san:san /opt/classprep
 
     # Create the 'student' user (if it does not exist)
     if id "student" &>/dev/null; then
@@ -45,14 +44,6 @@ setup_environment() {
         echo "Created user 'san' with default password."
     fi
 
-    # Remove 'student' from the sudo group (if they are in it)
-    if groups student | grep -q '\bsudo\b'; then
-        echo "Removing 'student' from sudo group..."
-        sudo deluser student sudo
-    else
-        echo "'student' does not have sudo privileges."
-    fi
-
     # Add 'san' to the sudo group
     if groups san | grep -q '\bsudo\b'; then
         echo "'san' already has sudo privileges."
@@ -60,6 +51,16 @@ setup_environment() {
         echo "Granting 'san' sudo privileges..."
         sudo usermod -aG sudo san
     fi
+
+    # Remove 'student' from the sudo group (if they are in it)
+    if groups student | grep -q '\bsudo\b'; then
+        echo "Removing 'student' from sudo group..."
+        sudo deluser student sudo
+    else
+        echo "'student' does not have sudo privileges."
+    fi
+    
+    sudo chown san:san /opt/classprep
 
     echo "Environment configured!"
 }
@@ -105,7 +106,9 @@ install_modules() {
     fi
 
     for module in $module_names; do
+        # Find the latest version by looking for files matching the module name pattern
         latest_version=$(ls "$MODULES_DIR/$module"-*.sh 2>/dev/null | sort -V | tail -n 1)
+
         if [[ -n "$latest_version" ]]; then
             echo "Installing module: $latest_version"
             sudo chmod +x "$latest_version"
@@ -118,6 +121,7 @@ install_modules() {
     echo "All available modules installed."
 }
 
+
 # Main menu
 main_menu() {
     echo "==================================="
@@ -125,7 +129,7 @@ main_menu() {
     echo "==================================="
     echo "1. Update system"
     echo "2. Install dependencies"
-    echo "3. Configure student environment"
+    echo "3. Configure admin account"
     echo "4. Fetch latest modules"
     echo "5. Install all local modules"
     echo "6. Run all steps"
