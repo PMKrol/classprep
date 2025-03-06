@@ -81,6 +81,10 @@ fetch_modules() {
     sudo rm -rf "$TEMP_DIR"
 
     echo "Modules fetched successfully."
+        
+    # List installed modules
+    echo "Installed modules:"
+    ls -lh "$MODULES_DIR"
 }
 
 # Function to install the latest version of all local modules
