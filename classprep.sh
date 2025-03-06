@@ -114,6 +114,9 @@ install_modules() {
         # Check if any versioned files exist for this module
         versioned_files=$(ls "$MODULES_DIR/$module"-*.sh 2>/dev/null)
 
+        # Debugging: Show versioned files that were found
+        echo "Found versioned files for $module: $versioned_files"
+
         if [[ -z "$versioned_files" ]]; then
             echo "No versioned files found for module: $module"
             continue
@@ -121,6 +124,9 @@ install_modules() {
 
         # Find the latest version by sorting the versioned files
         latest_version=$(echo "$versioned_files" | sort -V | tail -n 1)
+
+        # Debugging: Show the latest version being installed
+        echo "Latest version for $module: $latest_version"
 
         if [[ -n "$latest_version" ]]; then
             echo "Installing module: $latest_version"
@@ -133,8 +139,6 @@ install_modules() {
 
     echo "All available modules installed."
 }
-
-
 
 # Main menu
 main_menu() {
