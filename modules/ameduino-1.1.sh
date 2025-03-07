@@ -54,8 +54,8 @@ function install_ameduino() {
     echo "[Desktop Entry]" >> $ICON_PATH
     echo "Version=1.0" >> $ICON_PATH
     echo "Type=Application" >> $ICON_PATH
-    echo "Name=AMEDUINO" >> $ICON_PATH
-    echo "Exec=$SYMLINK" >> $ICON_PATH
+    echo "Name=ameduino" >> $ICON_PATH
+    echo Exec=ameduino >> $icon
     echo "Icon=" >> $ICON_PATH
     echo "Path=" >> $ICON_PATH
     echo "Terminal=false" >> $ICON_PATH
