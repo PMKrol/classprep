@@ -6,6 +6,7 @@ function install() {
 
     # Add user to the dialout group
     sudo usermod -a -G dialout student
+    sudo usermod -a -G dialout san
     
     # Install Arduino IDE
     sudo apt install arduino -y
