@@ -33,8 +33,8 @@ function revert() {
 }
 
 case "$1" in
-    configure) configure ;;
-    revert) revert ;;
+    install) configure ;;
+    uninstall) revert ;;
     *)
         echo "Usage: $0 {configure|revert}"
         exit 1

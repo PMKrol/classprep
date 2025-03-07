@@ -46,8 +46,8 @@ function enable() {
 }
 
 case "$1" in
-    disable) disable ;;
-    enable) enable ;;
+    install) disable ;;
+    uninstall) enable ;;
     *)
         echo "Usage: $0 {disable|enable}"
         exit 1
