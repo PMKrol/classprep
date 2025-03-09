@@ -175,8 +175,8 @@ install_classprep() {
     local script_path="/usr/local/bin/classprep.sh"
 
     # Download script
-    if curl -fsSL "$script_url" -o "$script_path"; then
-        chmod +x "$script_path"
+    if sudo curl -fsSL "$script_url" -o "$script_path"; then
+        sudo chmod +x "$script_path"
         echo "ClassPrep installed successfully in $script_path"
     else
         echo "Failed to download ClassPrep."
@@ -189,11 +189,11 @@ run_smart_test() {
     local disk="/dev/sda"
 
     echo "Starting SMART long test on $disk..."
-    smartctl -t long "$disk"
+    sudo smartctl -t long "$disk"
 
     echo "Monitoring SMART test progress..."
     while true; do
-        progress=$(smartctl -a "$disk" | grep "Self-test execution status" | awk '{print $5}')
+        progress=$(sudo smartctl -a "$disk" | grep "Self-test execution status" | awk '{print $5}')
         if [[ "$progress" == "0%" ]]; then
             break
         fi
