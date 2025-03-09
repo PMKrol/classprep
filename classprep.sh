@@ -168,6 +168,43 @@ install_modules() {
     echo "All available modules installed."
 }
 
+# Function to install classprep.sh
+install_classprep() {
+    echo "Installing ClassPrep..."
+    local script_url="https://raw.githubusercontent.com/PMKrol/classprep/main/classprep.sh"
+    local script_path="/usr/local/bin/classprep.sh"
+
+    # Download script
+    if curl -fsSL "$script_url" -o "$script_path"; then
+        chmod +x "$script_path"
+        echo "ClassPrep installed successfully in $script_path"
+    else
+        echo "Failed to download ClassPrep."
+        exit 1
+    fi
+}
+
+# Function to run SMART long test and monitor progress
+run_smart_test() {
+    local disk="/dev/sda"
+
+    echo "Starting SMART long test on $disk..."
+    smartctl -t long "$disk"
+
+    echo "Monitoring SMART test progress..."
+    while true; do
+        progress=$(smartctl -a "$disk" | grep "Self-test execution status" | awk '{print $5}')
+        if [[ "$progress" == "0%" ]]; then
+            break
+        fi
+        echo "Test in progress... ($progress% completed)"
+        sleep 5  # Check progress every 1 seconds
+    done
+
+    echo "SMART test completed. Press Enter to shut down."
+    read -r
+    shutdown -h now
+}
 
 # Main menu
 main_menu() {
@@ -179,8 +216,9 @@ main_menu() {
     echo "3. Configure admin account"
     echo "4. Fetch latest modules"
     echo "5. Install all local modules"
-    echo "6. Run all steps"
-    echo "7. Exit"
+    echo "6. Install ClassPrep & Run SMART Test"
+    echo "7. Run all steps"
+    echo "8. Exit"
     echo "==================================="
 
     read -p "Select an option: " option
@@ -190,26 +228,26 @@ main_menu() {
         3) setup_environment ;;
         4) fetch_modules ;;
         5) install_modules ;;
-        6) update_system && install_dependencies && setup_environment && fetch_modules && install_modules ;;
-        7) exit 0 ;;
+        6) install_classprep && run_smart_test ;;
+        7) update_system && install_dependencies && setup_environment && fetch_modules && install_modules && install_classprep && run_smart_test ;;
+        8) exit 0 ;;
         *) echo "Invalid choice!" ;;
     esac
 }
 
 # Check if the script is called with an argument
 if [[ -n "$1" ]]; then
-    # If argument is provided, directly call the corresponding function
     case $1 in
         1) update_system ;;
         2) install_dependencies ;;
         3) setup_environment ;;
         4) fetch_modules ;;
         5) install_modules ;;
-        6) update_system && install_dependencies && setup_environment && fetch_modules && install_modules ;;
-        7) exit 0 ;;
+        6) install_classprep && run_smart_test ;;
+        7) update_system && install_dependencies && setup_environment && fetch_modules && install_modules && install_classprep && run_smart_test ;;
+        8) exit 0 ;;
         *) echo "Invalid argument! Please provide a valid option number." ;;
     esac
 else
-    # If no argument is passed, show the menu
     main_menu
 fi
