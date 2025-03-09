@@ -193,13 +193,17 @@ run_smart_test() {
 
     echo "Monitoring SMART test progress..."
     while true; do
-        progress=$(sudo smartctl -a "$disk" | grep "Self-test execution status" | awk '{print $5}')
-        if [[ "$progress" == "0%" ]]; then
+        progress=$(sudo smartctl -a "$disk" | grep "Self-test execution status" | awk -F'[()%]' '{gsub(/ /, "", $2); print $2}')
+        
+        if [[ "$progress" == "0" ]]; then
             break
         fi
-        echo "Test in progress... ($progress% completed)"
-        sleep 5  # Check progress every 1 seconds
+        
+        echo "Test in progress... (Status: $progress)"
+        sleep 5  # Sprawdzaj co 60 sekund
     done
+
+    sudo smartctl -a $disk
 
     echo "SMART test completed. Press Enter to shut down."
     read -r
