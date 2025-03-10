@@ -40,8 +40,10 @@ setup_environment() {
         echo "User 'san' already exists."
     else
         sudo useradd -m san -s /bin/bash
-        echo "san:san" | sudo chpasswd
-        echo "Created user 'san' with default password."
+        echo "Podaj hasło dla użytkownika 'san':"
+        read -s password
+        echo "san:$password" | sudo chpasswd
+        echo "Utworzono użytkownika 'san' z podanym hasłem."
     fi
 
     # Add 'san' to the sudo group
@@ -233,7 +235,7 @@ main_menu() {
         4) fetch_modules ;;
         5) install_modules ;;
         6) install_classprep && run_smart_test ;;
-        7) update_system && install_dependencies && setup_environment && fetch_modules && install_modules && install_classprep && run_smart_test ;;
+        7) setup_environment && update_system && install_dependencies && fetch_modules && install_modules && install_classprep && run_smart_test ;;
         8) exit 0 ;;
         *) echo "Invalid choice!" ;;
     esac
