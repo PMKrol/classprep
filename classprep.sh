@@ -268,7 +268,7 @@ if [[ -n "$1" ]]; then
         4) fetch_modules ;;
         5) install_modules ;;
         6) install_classprep && run_smart_test ;;
-        7) update_system && install_dependencies && setup_environment && fetch_modules && install_modules && install_classprep && run_smart_test ;;
+        7) setup_environment && update_system && install_dependencies && fetch_modules && install_modules && install_classprep && run_smart_test ;;
         8) exit 0 ;;
         *) echo "Invalid argument! Please provide a valid option number." ;;
     esac
