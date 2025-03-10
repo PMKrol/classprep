@@ -35,6 +35,24 @@ setup_environment() {
         echo "Created user 'student' with default password."
     fi
 
+    # Ścieżka do katalogu /home/student
+    home_dir="/home/student"
+    
+    # Sprawdzamy, czy istnieją katalogi Desktop i Downloads
+    if [ -d "$home_dir/Desktop" ] && [ -d "$home_dir/Downloads" ]; then
+        echo "Katalogi Desktop i Downloads już istnieją. Nic nie robię."
+    else
+        # Jeśli nie istnieją, sprawdzamy katalogi Pulpit i Pobrane
+        if [ -d "$home_dir/Pulpit" ]; then
+            echo "Tworzę dowiązanie do katalogu Pulpit"
+            ln -s "$home_dir/Pulpit" "$home_dir/Desktop"
+        fi
+        if [ -d "$home_dir/Pobrane" ]; then
+            echo "Tworzę dowiązanie do katalogu Pobrane"
+            ln -s "$home_dir/Pobrane" "$home_dir/Downloads"
+        fi
+    fi
+
     # Create the 'san' user (if it does not exist)
     if id "san" &>/dev/null; then
         echo "User 'san' already exists."
